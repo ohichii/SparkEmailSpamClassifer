@@ -1,8 +1,0 @@
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-hi,
-
-nscd was the problem. He cached the local passwd ...
-
-cu denny

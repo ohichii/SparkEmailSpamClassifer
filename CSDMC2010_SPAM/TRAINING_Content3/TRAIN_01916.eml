@@ -1,9 +1,0 @@
-From nobody Tue Oct 31 17:28:51 2017
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-hi,
-
-nscd was the problem. He cached the local passwd ...
-
-cu denny

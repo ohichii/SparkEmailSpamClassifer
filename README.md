@@ -8,6 +8,8 @@ For this classification I used the the emails subject, because when using the wh
 
 ## Structure
 
+Under directory "SparkEmailSpamClassifer/src/main/java/"
+
 ```
 .
 ├── azmah

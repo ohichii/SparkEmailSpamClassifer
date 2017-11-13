@@ -36,13 +36,16 @@ import scala.Tuple2;
  */
 public class NaiveBayesTest {
 
-    private static HashingTF hashingTF;
+    public static HashingTF hashingTF;
 
-    private static IDFModel idfModel;
+    public static IDFModel idfModel;
 
-    private static NaiveBayesModel model;
+    public static NaiveBayesModel model;
 
-    private static Map<Integer,String> labels = new HashMap<>();
+    public static Map<Integer,String> labels = new HashMap<>();
+    public static Integer successNum;
+    public static Integer errorNum;
+    public static double accuracy;
 
     public static void main(String[] args) {
 
@@ -84,8 +87,8 @@ public class NaiveBayesTest {
             long predict = (new Double(model.predict(features))).longValue();
             dataResults.add(new Result(label, predict));
         }
-        Integer successNum = 0;
-        Integer errorNum = 0;
+        successNum = 0;
+        errorNum = 0;
 
         for (Result result : dataResults) {
             if (result.isCorrect()) {
@@ -103,7 +106,7 @@ public class NaiveBayesTest {
         });
         JavaPairRDD<Double, Double> predictionAndLabel
                 = testDataRdd.mapToPair((LabeledPoint p) -> new Tuple2<>(model.predict(p.features()), p.label()));
-        double accuracy = predictionAndLabel.filter((Tuple2<Double, Double> pl) -> pl._1().equals(pl._2())).count() / (double) test.count();
+        accuracy = predictionAndLabel.filter((Tuple2<Double, Double> pl) -> pl._1().equals(pl._2())).count() / (double) test.count();
 
         DecimalFormat df = new DecimalFormat("######0.0000");
         Double result = (Double.valueOf(successNum) / Double.valueOf(dataResults.size())) * 100;
@@ -120,7 +123,7 @@ public class NaiveBayesTest {
 
     }
 
-    public static void testModel(SparkSession sparkSession, String content){
+    public static Double testModel(SparkSession sparkSession, String content){
         List<Row> data = Arrays.asList(
                 RowFactory.create(AnsjUtils.participle(content))
         );
@@ -145,6 +148,8 @@ public class NaiveBayesTest {
         System.out.println("-------------------------------------------------------");
         System.out.println(predict);
         System.out.println("===================================");
+
+        return predict;
     }
 
 

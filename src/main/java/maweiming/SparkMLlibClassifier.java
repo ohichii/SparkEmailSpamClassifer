@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package azmah;
+package maweiming;
 
 import java.io.IOException;
 import org.apache.spark.SparkConf;
@@ -28,48 +28,49 @@ import org.apache.spark.sql.Row;
  */
 public class SparkMLlibClassifier {
 
-    public static void main(String[] args) throws IOException {
+    public static void train(JavaSparkContext jsc) throws IOException {
+      String path = "data_class/TrainingData.json";
 
-      /*  SparkConf conf = new SparkConf().setAppName("EmailClassifier").setMaster("local");
-        JavaSparkContext jsc = new JavaSparkContext(conf);
+      SparkSession spark = SparkSession.builder().appName("NaiveBayes").master("local")
+              .config("spark.driver.memory", "1073741824")
+              .config("spark.testing.memory", "10073741824")
+              .getOrCreate();
 
-        String path = "data_class/TrainingData.json";
+      Dataset<Row> train = spark.read().json(path);
 
-        SparkSession spark = SparkSession.builder().appName("NaiveBayes").master("local")
-                .config("spark.driver.memory", "1073741824")
-                .config("spark.testing.memory", "10073741824")
-                .getOrCreate();
+      //word frequency count
+      HashingTF hashingTF = new HashingTF().setNumFeatures(500000).setInputCol("subject").setOutputCol("rawFeatures");
+      Dataset<Row> featurizedData = hashingTF.transform(train);
 
-        Dataset<Row> train = spark.read().json(path);
+      //count tf-idf
+      IDF idf = new IDF().setInputCol("rawFeatures").setOutputCol("features");
+      IDFModel idfModel = idf.fit(featurizedData);
+      Dataset<Row> rescaledData = idfModel.transform(featurizedData);
 
-        //word frequency count
-        HashingTF hashingTF = new HashingTF().setNumFeatures(500000).setInputCol("subject").setOutputCol("rawFeatures");
-        Dataset<Row> featurizedData = hashingTF.transform(train);
+      JavaRDD<LabeledPoint> trainDataRdd = rescaledData.select("label", "features").javaRDD().map(v1 -> {
+          Long label = v1.getAs("label");
+          SparseVector features = v1.getAs("features");
+          Vector featuresVector = Vectors.dense(features.toArray());
+          return new LabeledPoint(Long.valueOf(label), featuresVector);
+      });
 
-        //count tf-idf
-        IDF idf = new IDF().setInputCol("rawFeatures").setOutputCol("features");
-        IDFModel idfModel = idf.fit(featurizedData);
-        Dataset<Row> rescaledData = idfModel.transform(featurizedData);
+      System.out.println("Start training...");
+      NaiveBayesModel model = NaiveBayes.train(trainDataRdd.rdd());
+      model.save(spark.sparkContext(), "data_class/modelPath");//save model
+      hashingTF.save("data_class/tfPath");//save tf
+      idfModel.save("data_class/idfPath");//save idf
 
-        JavaRDD<LabeledPoint> trainDataRdd = rescaledData.select("label", "features").javaRDD().map(v1 -> {
-            Long label = v1.getAs("label");
-            SparseVector features = v1.getAs("features");
-            Vector featuresVector = Vectors.dense(features.toArray());
-            return new LabeledPoint(Long.valueOf(label), featuresVector);
-        });
+      System.out.println("train successfully !");
+      System.out.println("=======================================================");
+      System.out.println("modelPath:" + DataFactory.MODEL_PATH);
+      System.out.println("tfPath:" + DataFactory.TF_PATH);
+      System.out.println("idfPath:" + DataFactory.IDF_PATH);
+      System.out.println("=======================================================");
 
-        System.out.println("Start training...");
-        NaiveBayesModel model = NaiveBayes.train(trainDataRdd.rdd());
-        model.save(spark.sparkContext(), "data_class/modelPath");//save model
-        hashingTF.save("data_class/tfPath");//save tf
-        idfModel.save("data_class/idfPath");//save idf
+    }
 
-        System.out.println("train successfully !");
-        System.out.println("=======================================================");
-        System.out.println("modelPath:" + DataFactory.MODEL_PATH);
-        System.out.println("tfPath:" + DataFactory.TF_PATH);
-        System.out.println("idfPath:" + DataFactory.IDF_PATH);
-        System.out.println("=======================================================");
-        */
+    public static void main(String[] args)  {
+
+
     }
 }

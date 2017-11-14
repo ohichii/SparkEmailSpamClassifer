@@ -30,6 +30,12 @@ public class App {
         String trainingFile = "CSDMC2010_SPAM/TRAINING_SUB/";
         String labelsFile = "CSDMC2010_SPAM/SPAMTrain.label";
         String stopWordsFile = "stop_words.txt";
+        ArrayList<String> stopWords = new ArrayList<>();
+        Scanner in = new Scanner(new File(stopWordsFile));
+        while (in.hasNext()) {
+            String next = in.nextLine();
+            stopWords.add(next);
+        }
 
 
         get("/hello", (request, response) -> "Hello hamzaaaa!");
@@ -87,12 +93,13 @@ public class App {
             String subjectres;
             String subjectres2;
             String subject = request.queryParams("subject");
-            if (Classifier.isSpam(subject)) {
+            String normSubject = EmailNormalizer.normalize(subject, stopWords);
+            if (Classifier.isSpam(normSubject)) {
                 subjectres = "SPAM";
             } else {
                 subjectres = "HAM";
             }
-            if (NaiveBayesTest.testModel(spark,subject) == 0.0) {
+            if (NaiveBayesTest.testModel(spark,normSubject) == 0.0) {
                 subjectres2 = "SPAM";
             } else {
                 subjectres2 = "HAM";

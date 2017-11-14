@@ -78,6 +78,10 @@ public class EmailNormalizer {
     }
 
     public static JavaRDD<String> readAndNormalizeInput(JavaSparkContext sc, String trainingFile, String labelsFile, String stopWordsFile) throws FileNotFoundException {
+        File f1 = new File("data_class/inputSpam/");
+        File f2 = new File("data_class/inputHam/");
+        File f3 = new File("data_class/test/");
+        if(f1.exists()) return null;
 
         ArrayList<String> stopWords = new ArrayList<>();
         Scanner in = new Scanner(new File("stop_words.txt"));

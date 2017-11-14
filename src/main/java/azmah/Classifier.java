@@ -80,7 +80,8 @@ public class Classifier {
     }
 
     public static void makeDictionary(JavaSparkContext jsc) throws Exception {
-
+      File f1 = new File("data_class/dictionary/");
+      if(f1.exists()) return;
         final Broadcast<Integer> cntWordsSpam = jsc.broadcast(addCounts(spamCounts)); // Total unique words in spam dataset
         final Broadcast<Integer> cntWordsHam = jsc.broadcast(addCounts(hamCounts)); // Total unique words in ham dataset
 

@@ -59,34 +59,23 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+This project requires Gradle and a Java JDK or JRE to be installed, version 7 or higher (to check, use java -version). Gradle ships with its own Groovy library, therefore Groovy does not need to be installed. Any existing Groovy installation is ignored by Gradle.
 
-```
-Give examples
-```
-
-### Installing
-
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
+Gradle uses whatever JDK it finds in your path. Alternatively, you can set the JAVA_HOME environment variable to point to the installation directory of the desired JDK.
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
+Just put the project in your machine and rub the following command :
 
+```
+gradle run
+```
+* And then open your browser and go to http://localhost:4567/readinput, here program starts reading the data and saving it after it's normalized by calling the methods from EmailNormalizer class.
+* then click on the button "Go to make dictionary",this will lead you to the second link http://localhost:4567/makedictionary. Here we start the training process which makes the two models that our classifiers will be based on, here we call the method makeDictionary() from Classifier class and train() from SparkMLlibClassifier.
+* then click on the button "Test Classification",this will lead you to the third link http://localhost:4567/testclassification. here we test both classifiers on the same dataset and we can see the difference between their results.
+* then click on the button "test single",this will lead you to this link http://localhost:4567/testsingle. and here you can test the Classifiers on a single email by entring its subject.
+
+**PS. the order is very important, and the first two links are supposed to called only once, because they create some files, so may get some errors if you try enter to one of them a second time, after the first execution you can go directly to http://localhost:4567/testclassification to make tests.**
 
 ## Deployment
 

@@ -19,6 +19,8 @@ import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
 import java.util.Arrays;
 import org.apache.spark.api.java.Optional;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Classifier {
 

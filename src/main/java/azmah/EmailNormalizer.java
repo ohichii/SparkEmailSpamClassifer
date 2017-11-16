@@ -97,7 +97,7 @@ public class EmailNormalizer {
             String[] parts = line.split(" ");
             return new Tuple2<>(parts[1], Integer.parseInt(parts[0]));
         });
-        // Filter Spam and Ham records from the input
+        // Filter Spam and Ham records from the labels
         List<String> spamList = labels.filter((String s) -> s.startsWith("0"))
                 .map((String s) -> s.replaceAll("0 ", ""))
                 .collect();//SPAM

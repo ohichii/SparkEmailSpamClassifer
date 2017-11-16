@@ -12,10 +12,15 @@ import static spark.Spark.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
 import maweiming.*;
 
 public class App {
-
+    static long totalTime1;
+    static long totalTime2;
     public static void main(String[] args) throws Exception {
 
         staticFileLocation("/public");
@@ -47,12 +52,21 @@ public class App {
         }, new VelocityTemplateEngine());
 
         get("/makedictionary", (request, response) -> {
+          long startTime = System.currentTimeMillis();
             HashMap model = new HashMap();
             // Using my implementation the NaiveBayesModel
             Classifier.computeProbability(jsc);
             Classifier.makeDictionary(jsc);
+            long endTime   = System.currentTimeMillis();
+            totalTime1 = endTime - startTime;
             // Using NaiveBayesModel MLlib from Spark
+            startTime = System.currentTimeMillis();
             SparkMLlibClassifier.train(jsc);
+            endTime   = System.currentTimeMillis();
+            totalTime2 = endTime - startTime;
+
+            model.put("totalTime1", totalTime1);
+            model.put("totalTime2", totalTime2);
             model.put("template", "templates/makedictionary.vtl");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
@@ -65,9 +79,18 @@ public class App {
           //load model
           NaiveBayesTest.model = NaiveBayesModel.load(spark.sparkContext(), "data_class/modelPath");
             HashMap model = new HashMap();
+            //
+            long startTime = System.currentTimeMillis();
             Classifier.computeProbability(jsc);
             Classifier.testClassification(jsc);
+            long endTime   = System.currentTimeMillis();
+            totalTime1 = endTime - startTime;
+
+            startTime = System.currentTimeMillis();
             NaiveBayesTest.batchTestModel(spark, "data_class/TestingData.json");
+            endTime   = System.currentTimeMillis();
+            totalTime2 = endTime - startTime;
+
             model.put("truePos", Classifier.truePos);
             model.put("falsePos", Classifier.falsePos);
             model.put("falseNeg", Classifier.falseNeg);
@@ -75,8 +98,10 @@ public class App {
             model.put("accuracy", Classifier.accuracy);
             model.put("precision", Classifier.precision);
             model.put("recall", Classifier.recall);
+            model.put("totalTime1", totalTime1);
 
             model.put("accuracy2", NaiveBayesTest.accuracy);
+            model.put("totalTime2", totalTime2);
 
             model.put("template", "templates/testclassification.vtl");
             return new ModelAndView(model, layout);
